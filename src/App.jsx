@@ -1,140 +1,162 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-// Importing Professional Components
+/** * UI Components architected as per Philip Jennings' Single-Screen specification.
+ * Optimized for Pi Browser mobile viewport.
+ */
 import Navbar from './components/Navbar';
-import StatCard from './components/StatCard';
-import AuditLedger from './components/AuditLedger';
+import PriceGraph from './components/PriceGraph';
+import StatsPanel from './components/StatsPanel';
+import ActionButtons from './components/ActionButtons';
 
-// Global Stylesheet
 import './App.css';
 
 /**
- * MapCap Executive Dashboard - Production Grade
- * Architected for Pi Network Ecosystem | Built by Eslam Kora
- * Integration: Node.js Backend + Pi SDK v2.0
+ * MapCapIPO Main Application Engine v1.0
+ * * Visionary: Philip Jennings & Daniel (Map-of-Pi)
+ * Architect: Eslam Kora
+ * * This engine synchronizes the 4-week IPO phase logic, managing real-time
+ * spot-price growth, pioneer allocations, and blockchain transactions.
  */
 function App() {
-  // Core Tokenomics State: Defined by Philip Jennings' 4M Pi Vision
+  /**
+   * Centralized Application State.
+   * Based on the 4 key metrics required for transparency during the IPO phase.
+   */
   const [metrics, setMetrics] = useState({
-    totalSupply: 4000000,
-    pioneerAllocation: 2181818,
-    status: 'Initializing Engine...'
+    totalInvestors: 0, // Value 1: Unique Pioneer count
+    totalPi: 0,        // Value 2: Total Pi in MapCapIPO escrow wallet
+    userPi: 0,         // Value 3: Specific Pioneer's contribution
+    dailyPrices: []    // Dataset for the Spot-price growth graph (28-day cycle)
   });
 
-  // System Logs State for the Audit Ledger
-  const [auditLogs, setAuditLogs] = useState([
-    "Initializing MapCap Smart Contract... Success",
-    "Establishing MERN Stack Data Stream..."
-  ]);
-
-  const [walletConnected, setWalletConnected] = useState(false);
-  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     /**
-     * Backend Synchronization:
-     * Connects to the local Node.js engine on Port 3000 to fetch real-time stats.
-     */
-    const syncWithBackend = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/api/stats');
-        setMetrics(prev => ({ 
-          ...prev, 
-          ...response.data, 
-          status: 'Engine Online ✅' 
-        }));
-        setAuditLogs(prev => [...prev, "Backend Synchronization Complete."]);
-      } catch (err) {
-        setMetrics(prev => ({ ...prev, status: 'Engine Offline ❌' }));
-        setAuditLogs(prev => [...prev, "Critical: Backend Connection Failed."]);
-      }
-    };
-
-    syncWithBackend();
-    
-    /**
-     * Pi SDK Initialization:
-     * Sandbox mode enabled for development as per Map-of-Pi requirements.
+     * Pi SDK Lifecycle Management:
+     * Automatic initialization upon app entry within the Pi Browser.
+     * Environment: Sandbox enabled for secure dev-testing.
      */
     if (window.Pi) {
       window.Pi.init({ version: "2.0", sandbox: true });
-      setAuditLogs(prev => [...prev, "Pi SDK v2.0 Initialized in Sandbox."]);
+      authenticatePioneer();
     }
+
+    /** Initial data sync with Node.js/MongoDB backend */
+    fetchLiveIPOData();
   }, []);
 
   /**
-   * Wallet Authentication Handler:
-   * Triggers the Pi Browser's native auth flow for Pioneer identification.
+   * Authenticates the Pioneer using Pi Network's Native Auth Flow.
+   * Scopes: username (Identification), payments (U2A), wallet_address (A2UaaS).
    */
-  const handlePiLogin = async () => {
+  const authenticatePioneer = async () => {
     try {
       const scopes = ['username', 'payments', 'wallet_address'];
-      
-      // Callback for incomplete payments to ensure blockchain integrity
-      const onIncompletePaymentFound = (payment) => {
-        setAuditLogs(prev => [...prev, `Action Required: Incomplete Payment ${payment.identifier}`]);
-      };
+      const auth = await window.Pi.authenticate(scopes, (payment) => {
+        // Audit callback for incomplete payments to ensure ledger integrity.
+        console.warn("Audit: Incomplete Payment Detected:", payment);
+      });
+      setCurrentUser(auth.user);
+      console.log(`Pioneer session established: @${auth.user.username}`);
+    } catch (err) {
+      console.error("Authentication rejected by user or network.");
+    }
+  };
 
-      const auth = await window.Pi.authenticate(scopes, onIncompletePaymentFound);
-      setWalletConnected(true);
-      setUserData(auth.user);
-      setAuditLogs(prev => [...prev, `Pioneer @${auth.user.username} Authenticated.`]);
-    } catch (error) {
-      console.error("Authentication Error:", error);
-      setAuditLogs(prev => [...prev, "Auth Failure: User denied access."]);
+  /**
+   * Fetches real-time IPO statistics from the MERN backend.
+   * Includes the dynamically calculated daily spot-price array for the SVG Graph.
+   */
+  const fetchLiveIPOData = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/mapcap-stats');
+      setMetrics(response.data);
+      setLoading(false);
+    } catch (err) {
+      console.error("Engine Sync Error: Backend unreachable.");
+      setLoading(false);
+    }
+  };
+
+  /**
+   * Financial Action: Invest (User-to-App Transfer)
+   * Triggers the Pi SDK payment flow. Minimal investment threshold: 1 Pi.
+   * @param {number} amount - The amount of Pi the pioneer wishes to commit.
+   */
+  const handleInvest = async (amount) => {
+    if (amount < 1) return alert("Minimum participation requires 1 Pi.");
+    
+    try {
+      await window.Pi.createPayment({
+        amount: amount,
+        memo: "MapCap IPO Phase Entry",
+        metadata: { type: "IPO_INVESTMENT", timestamp: Date.now() }
+      }, {
+        onReadyForServerApproval: (paymentId) => {
+          // Phase 1: Notifying backend to lock transaction in audit logs
+          axios.post('http://localhost:3000/api/approve-payment', { paymentId });
+        },
+        onReadyForServerCompletion: (paymentId, txid) => {
+          // Phase 2: Finalizing ledger update after blockchain confirmation
+          axios.post('http://localhost:3000/api/complete-payment', { paymentId, txid });
+          fetchLiveIPOData(); // Refresh UI to reflect new totalPi and userPi
+        },
+        onCancel: (paymentId) => console.log("Transaction cancelled by Pioneer."),
+        onError: (error) => console.error("Payment Engine Failure:", error)
+      });
+    } catch (err) {
+      console.error("SDK Payment Request failed.");
+    }
+  };
+
+  /**
+   * Financial Action: Withdraw (App-to-User-as-a-Service)
+   * Utilizes EscrowPi A2UaaS protocol for secure percentage-based withdrawals.
+   * @param {number} percentage - Percentage of the user's current balance to withdraw.
+   */
+  const handleWithdraw = async (percentage) => {
+    try {
+      // Logic aligns with 'Whale Prevention' and 'Liquidity Management' as per Page 5.
+      await axios.post('http://localhost:3000/api/withdraw', { 
+        percentage,
+        username: currentUser?.username 
+      });
+      alert(`Withdrawal sequence for ${percentage}% initiated. Processing A2UaaS transfer...`);
+      fetchLiveIPOData();
+    } catch (err) {
+      alert("Withdrawal unsuccessful. Ensure sufficient balance exists.");
     }
   };
 
   return (
     <div className="mapcap-root">
-      {/* Visual Identity Layer */}
-      <div className="glass-grid"></div>
+      {/* Section 1: Top 33.33% - Branding & Spot-price Visualization.
+          Strict adherence to Page 3 & Page 8 screen layouts.
+      */}
+      <section className="section-top">
+        <Navbar />
+        <PriceGraph dailyPrices={metrics.dailyPrices} />
+      </section>
 
-      {/* Navigation Layer */}
-      <Navbar status={metrics.status} />
+      {/* Section 2: Middle 33.33% - Transparent Tokenomics Stats.
+          Calculates the 20% capital gain anticipated for LP launch.
+      */}
+      <section className="section-middle">
+        <StatsPanel metrics={metrics} />
+      </section>
 
-      <main className="dashboard-grid">
-        {/* Metric Overview Section */}
-        <section className="stats-container">
-          <StatCard 
-            label="TOTAL PI SUPPLY" 
-            value={metrics.totalSupply} 
-            colorClass="glow-purple" 
-          />
-          <StatCard 
-            label="PIONEER ALLOCATION" 
-            value={metrics.pioneerAllocation} 
-            colorClass="glow-gold" 
-            percentage={54.5} 
-          />
-        </section>
-
-        {/* Governance & Participation Section */}
-        <section className="action-center">
-          <div className="action-card">
-            <h2>Project Governance</h2>
-            <p>Secure your equity in the Map-of-Pi ecosystem via Pi Blockchain verification.</p>
-            
-            {!walletConnected ? (
-              <button className="pi-main-btn" onClick={handlePiLogin}>
-                CONNECT PI WALLET ⚡
-              </button>
-            ) : (
-              <div className="success-badge">
-                Authenticated as: <strong>@{userData?.username}</strong>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Real-time Audit Section */}
-        <AuditLedger logs={auditLogs} />
-      </main>
-
-      <footer className="main-footer">
-        <p>© 2026 MapCap Engine | AppDev @Map-of-Pi | Integrated MERN Solution</p>
-      </footer>
+      {/* Section 3: Bottom 33.33% - Participation & Liquidity Controls.
+          Provides UI for Invest (U2A) and Withdraw (A2UaaS) functions.
+      */}
+      <section className="section-bottom">
+        <ActionButtons 
+          onInvest={handleInvest} 
+          onWithdraw={handleWithdraw} 
+        />
+      </section>
     </div>
   );
 }
