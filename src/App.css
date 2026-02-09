@@ -1,157 +1,222 @@
 /**
- * MapCapIPO Official Design System
- * Based on Philip Jennings' Use Case Document (Feb 6, 2026)
- * Strict adherence to: White background, Green navbar, Gold accents.
+ * MapCapIPO Official Stylesheet v1.0
+ * Architected by Eslam Kora | Based on Philip Jennings' UX Document
+ * * DESIGN PRINCIPLES:
+ * 1. Single Screen View: No scrolling, fixed 100vh layout.
+ * 2. Visual Hierarchy: Balanced 33.33% vertical split.
+ * 3. Branding: Hex-accurate Green (#1b5e20) and Gold (#ffd700).
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
 :root {
-  [span_3](start_span)/* Official Colors as per Documentation[span_3](end_span) */
-  --mapcap-green: #1b5e20; [span_4](start_span)/* Consistent green used throughout the app[span_4](end_span) */
-  --mapcap-gold: #ffd700;  [span_5](start_span)/* Consistent gold used for fonts and icons[span_5](end_span) */
-  --pure-white: #ffffff;   [span_6](start_span)/* Background specified as plain white[span_6](end_span) */
-  --text-dark: #333333;
+  /* Official Color Palette [Source: Page 3] */
+  --mapcap-green: #1b5e20;
+  --mapcap-gold: #ffd700;
+  --pure-white: #ffffff;
+  --text-main: #212121;
+  --text-muted: #666666;
+  --input-bg: #f5f5f5;
+  --transition: all 0.3s ease;
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent; /* Optimized for mobile touch */
 }
 
 body, html {
-  height: 100%;
+  height: 100vh;
+  width: 100vw;
   font-family: 'Inter', sans-serif;
-  background-color: var(--pure-white); [span_7](start_span)/* Plain white background[span_7](end_span) */
-  overflow: hidden; [span_8](start_span)[span_9](start_span)/* Optimized for single screen mobile use[span_8](end_span)[span_9](end_span) */
+  background-color: var(--pure-white);
+  color: var(--text-main);
+  overflow: hidden; /* Prevents bounce-scroll on mobile browsers */
 }
 
 .mapcap-root {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  width: 100vw;
+  width: 100%;
 }
 
 /**
- * [span_10](start_span)Section Layout: Three sections of equal height[span_10](end_span)
- * [span_11](start_span)No visible section divider lines[span_11](end_span)
+ * SECTION LAYOUT [Source: Page 8 Screen Layout]
+ * Divides the viewport into three equal vertical zones.
  */
-.section-top, .section-middle, .section-bottom {
-  height: 33.33vh; [span_12](start_span)/* Equal height sections[span_12](end_span) */
+.section-top, 
+.section-middle, 
+.section-bottom {
+  height: 33.333vh;
   width: 100%;
   display: flex;
   flex-direction: column;
   position: relative;
 }
 
-/* --- TOP SECTION: NAVBAR & GRAPH --- */
+/* --- TOP SECTION: BRANDING & MARKET DATA --- */
 
-/**
- * [span_13](start_span)Green Navbar with Gold text[span_13](end_span)
- */
 .main-navbar {
-  background-color: var(--mapcap-green); [span_14](start_span)/* Horizontal green bar[span_14](end_span) */
-  color: var(--mapcap-gold); [span_15](start_span)/* Gold font text[span_15](end_span) */
-  width: 100%;
-  padding: 10px 0;
-  text-align: center;
+  background-color: var(--mapcap-green);
+  color: var(--mapcap-gold);
+  padding: 12px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  z-index: 10;
 }
 
 .navbar-title {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-bottom: 5px; [span_16](start_span)/* Space for icons below[span_16](end_span) */
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
 }
 
 .navbar-icons {
   display: flex;
-  justify-content: space-around; [span_17](start_span)/* Icons spread across width[span_17](end_span) */
+  justify-content: space-evenly;
   align-items: center;
-  padding: 0 10%;
 }
 
-.icon-gold { color: var(--mapcap-gold); }
+.icon-gold {
+  color: var(--mapcap-gold);
+  font-size: 1.4rem;
+  cursor: pointer;
+}
 
-/**
- * [span_18](start_span)MapCap Spot-price Graph[span_18](end_span)
- */
+.active-btn:active {
+  transform: scale(0.9); /* Feedback for mobile touch */
+}
+
 .graph-container {
-  flex-grow: 1;
-  padding: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-[span_19](start_span)/* Axes, ticks, and lines must be green[span_19](end_span) */
-.graph-element-green {
-  stroke: var(--mapcap-green);
-  color: var(--mapcap-green);
-}
-
-/* --- MIDDLE SECTION: STATISTICS --- */
-
-.stats-panel {
-  padding: 20px;
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 10px;
+  align-items: center;
+  padding: 10px;
+}
+
+.mapcap-svg-graph {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+}
+
+.axis-line { stroke: var(--mapcap-green); stroke-width: 1; }
+.axis-label { fill: var(--mapcap-green); font-size: 10px; font-weight: 600; }
+.price-guideline { stroke: #e0e0e0; stroke-width: 0.5; }
+
+/* --- MIDDLE SECTION: TRANSPARENT LEDGER --- */
+
+.stats-panel {
+  padding: 0 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: linear-gradient(to bottom, #ffffff, #fafafa);
+}
+
+.section-title {
+  color: var(--mapcap-green);
+  font-size: 1rem;
+  margin-bottom: 15px;
+  border-left: 4px solid var(--mapcap-gold);
+  padding-left: 10px;
+}
+
+.stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .stat-item {
-  font-size: 0.95rem;
-  color: var(--text-dark);
-  border-bottom: 1px solid #f0f0f0;
-  padding-bottom: 5px;
+  font-size: 0.9rem;
+  font-weight: 400;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed #eee;
+  padding-bottom: 4px;
 }
 
-/* --- BOTTOM SECTION: ACTIONS --- */
+.highlight-gain {
+  color: var(--mapcap-green);
+  font-weight: 700;
+  border-bottom: none;
+}
+
+/* --- BOTTOM SECTION: LIQUIDITY CONTROLS --- */
 
 .action-center {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  padding: 0 30px;
+  background-color: var(--pure-white);
   gap: 15px;
 }
 
 .input-group {
   display: flex;
-  align-items: center;
+  width: 100%;
   gap: 10px;
-  width: 80%;
+  align-items: center;
+}
+
+.input-wrapper {
+  position: relative;
+  flex: 1;
 }
 
 .input-field {
-  flex-grow: 1;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background: #f9f9f9;
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #eee;
+  border-radius: 8px;
+  background: var(--input-bg);
+  font-size: 1rem;
+  font-weight: 600;
+  transition: var(--transition);
 }
 
-/**
- * [span_20](start_span)Invest & Withdraw Buttons[span_20](end_span)
- * [span_21](start_span)Rectangular with rounded corners, green color, gold text[span_21](end_span)
- */
+.input-field:focus {
+  border-color: var(--mapcap-green);
+  background: #fff;
+}
+
+.input-unit {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
 .btn-mapcap {
-  background-color: var(--mapcap-green); [span_22](start_span)/* Green color as navbar[span_22](end_span) */
-  color: var(--mapcap-gold); [span_23](start_span)/* Gold text[span_23](end_span) */
+  background-color: var(--mapcap-green);
+  color: var(--mapcap-gold);
   border: none;
-  padding: 12px 25px;
-  border-radius: 8px; [span_24](start_span)/* Rounded corners[span_24](end_span) */
-  font-weight: bold;
-  min-width: 120px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  min-width: 130px;
   cursor: pointer;
-  text-transform: capitalize;
+  box-shadow: 0 4px 6px rgba(27, 94, 32, 0.2);
+  transition: var(--transition);
 }
 
-/* --- UTILITIES --- */
-.text-center { text-align: center; }
-.calculating-text {
-  color: var(--mapcap-green);
-  font-style: italic; [span_25](start_span)/* Displayed when price is not yet calculated[span_25](end_span) */
+.btn-mapcap:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+/* --- UTILS --- */
+.flex-center { display: flex; justify-content: center; align-items: center; }
+.animate-pulse { animation: pulse 2s infinite; }
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
 }
