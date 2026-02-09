@@ -2,7 +2,7 @@
  * MapCapIPO Official Design System v1.2
  * ---------------------------------------------------------
  * Lead Architect: Eslam Kora | AppDev @Map-of-Pi
- * Project: MapCap Ecosystem | Spec: Philip Jennings
+ * Project: MapCap Ecosystem | Spec: Philip Jennings & Daniel
  * * DESIGN PRINCIPLES:
  * 1. Single-Screen Policy: Strictly 100vh with NO scrolling.
  * 2. Visual Balance: 33.33% vertical distribution per logic pillar.
@@ -12,24 +12,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
 :root {
-  /* Brand Palette [Source: Page 3] */
+  /* Brand Palette - Philip's Spec Page 3 */
   --mapcap-green: #1b5e20;
   --mapcap-gold: #ffd700;
+  --mapcap-light-green: #e8f5e9;
   --pure-white: #ffffff;
   --text-main: #212121;
   --text-muted: #666666;
   --input-bg: #f5f5f5;
-  --transition: all 0.3s ease;
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.1);
+  --error-red: #d32f2f;
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Global Reset for Mobile Viewports */
+/* Global Reset & Mobile Optimization */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
-  user-select: none; /* Prevents accidental text selection in Pi Browser */
+  user-select: none;
 }
 
 body, html {
@@ -38,14 +39,15 @@ body, html {
   font-family: 'Inter', sans-serif;
   background-color: var(--pure-white);
   color: var(--text-main);
-  overflow: hidden; /* Enforces Requirement [Page 8] */
+  overflow: hidden; /* Enforces Page 8: No-Scroll Rule */
 }
 
 #root {
   height: 100vh;
 }
 
-.mapcap-root {
+/* Base Layout Container */
+.mapcap-root-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -53,12 +55,9 @@ body, html {
 }
 
 /**
- * ARCHITECTURAL LAYOUT: 3 PILLARS
- * Each section occupies exactly 1/3 of the vertical viewport.
+ * ARCHITECTURAL LAYOUT: THE 3 PILLARS (33.33vh each)
  */
-.section-top, 
-.section-middle, 
-.section-bottom {
+.layout-section {
   height: 33.333vh;
   width: 100%;
   display: flex;
@@ -67,41 +66,24 @@ body, html {
   overflow: hidden;
 }
 
-/* --- SECTION 1: BRANDING & MARKET DATA --- */
+/* --- SECTION 1: TOP (BRANDING & GRAPH) --- */
+.section-top {
+  background: linear-gradient(to bottom, var(--mapcap-green) 20%, white 100%);
+}
 
 .main-navbar {
   background-color: var(--mapcap-green);
   color: var(--mapcap-gold);
-  padding: 8px 0;
-  z-index: 10;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  padding: 10px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .navbar-title {
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-size: 0.9rem;
+  font-weight: 800;
   text-align: center;
   text-transform: uppercase;
-  letter-spacing: 1.2px;
-  margin-bottom: 4px;
-}
-
-.navbar-icons {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 4px 10px;
-}
-
-.icon-gold {
-  color: var(--mapcap-gold);
-  font-size: 1.3rem;
-  cursor: pointer;
-}
-
-.active-btn:active {
-  transform: scale(0.9);
-  opacity: 0.7;
+  letter-spacing: 1.5px;
 }
 
 .graph-container {
@@ -109,143 +91,134 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 5px 20px;
+  padding: 10px;
 }
 
-.mapcap-svg-graph {
-  width: 100%;
-  max-width: 400px;
-  height: auto;
+/* --- SECTION 2: MIDDLE (STATS LEDGER) --- */
+.section-middle {
+  padding: 10px 20px;
+  background-color: #fafafa;
+  border-top: 1px solid #f0f0f0;
+  justify-content: center;
 }
-
-/* --- SECTION 2: TRANSPARENCY LEDGER (STATS) --- */
 
 .stats-panel {
-  padding: 15px 25px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  background-color: #fafafa;
-}
-
-.section-title {
-  color: var(--mapcap-green);
-  font-size: 0.8rem;
-  font-weight: 700;
-  margin-bottom: 10px;
-  letter-spacing: 0.5px;
-}
-
-.stats-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .stat-item {
-  font-size: 0.85rem;
   display: flex;
   justify-content: space-between;
-  padding: 6px 0;
-  border-bottom: 1px solid #f0f0f0;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #eeeeee;
 }
 
-.stat-label { color: var(--text-muted); }
-.stat-value { font-weight: 600; color: var(--mapcap-green); }
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
 
+.stat-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--mapcap-green);
+}
+
+/* Value 4: Highlight Gain Box */
 .highlight-gain {
-  background-color: #e8f5e9;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px dashed var(--mapcap-green);
+  background-color: var(--mapcap-light-green);
+  padding: 12px;
+  border-radius: 12px;
+  border: 1.5px dashed var(--mapcap-green);
+  text-align: center;
   margin-top: 5px;
 }
 
-/* --- SECTION 3: LIQUIDITY CONTROLS (ACTIONS) --- */
-
-.action-center {
-  padding: 20px 25px;
+/* --- SECTION 3: BOTTOM (LIQUIDITY CONTROLS) --- */
+.section-bottom {
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-around;
+  border-top: 2px solid #f5f5f5;
+  background: white;
+}
+
+.action-center {
+  display: flex;
+  flex-direction: column;
   gap: 15px;
-  border-top: 1px solid #eee;
 }
 
 .input-group {
   display: flex;
-  gap: 12px;
-  width: 100%;
-}
-
-.input-wrapper {
-  flex: 1;
-  position: relative;
+  gap: 10px;
 }
 
 .input-field {
-  width: 100%;
+  flex: 1;
   padding: 14px;
   background: var(--input-bg);
-  border: 1.5px solid transparent;
-  border-radius: 10px;
+  border: 2px solid transparent;
+  border-radius: 12px;
   font-size: 1rem;
   font-weight: 700;
-  color: var(--mapcap-green);
   transition: var(--transition);
 }
 
 .input-field:focus {
   border-color: var(--mapcap-green);
   background: white;
-}
-
-.input-unit {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  font-weight: 600;
+  outline: none;
 }
 
 .btn-mapcap {
   background-color: var(--mapcap-green);
   color: var(--mapcap-gold);
   border: none;
-  padding: 0 20px;
-  border-radius: 10px;
+  padding: 0 25px;
+  border-radius: 12px;
   font-weight: 700;
-  font-size: 0.85rem;
   text-transform: uppercase;
+  cursor: pointer;
   box-shadow: 0 4px 0 #0d280e;
-  transition: 0.1s;
 }
 
 .btn-mapcap:active {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 #0d280e;
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #0d280e;
 }
 
-/* --- ANIMATIONS --- */
+/* --- LOADING & ANIMATIONS --- */
+.loading-screen {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--mapcap-green);
+  color: var(--mapcap-gold);
+}
 
-.animate-pulse {
-  animation: pulse 2s infinite ease-in-out;
+.brand-pulse {
+  text-align: center;
+  animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(0.98); }
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.95); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
+/* Daniel's Whale Warning */
 .whale-warning {
-  margin-top: 10px;
-  color: #d32f2f;
-  font-size: 0.7rem;
+  color: var(--error-red);
+  font-size: 0.75rem;
   font-weight: 600;
   text-align: center;
-  background: #ffebee;
-  padding: 4px;
-  border-radius: 4px;
+  padding: 5px;
 }
