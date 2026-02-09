@@ -1,23 +1,23 @@
 /**
- * MapCap IPO - Main Application Layout (Context-Enabled)
+ * MapCap IPO - Main Application Orchestrator (Context-Driven)
  * ---------------------------------------------------------
- * Architect: Eslam Kora | AppDev @Map-of-Pi
+ * Lead Architect: Eslam Kora | AppDev @Map-of-Pi
  * Project: MapCap Ecosystem | Spec: Philip Jennings & Daniel
- * * DESIGN PRINCIPLE:
- * This component enforces the 33.33% vertical split while acting
- * as the orchestrator for Pi SDK authentication and data hydration.
+ * * DESIGN PRINCIPLE: 
+ * Implements the "Golden Ratio" layout (33.33vh vertical split).
+ * Handles the critical Pi SDK Handshake and global state hydration.
  */
 
 import React, { useEffect } from 'react';
 import './App.css';
 
-// Importing UI Components per Philip's Layout [Source: Page 8]
+// UI Components - Orchestrating the "Single-Screen" Architecture
 import Navbar from './components/Navbar';
 import PriceGraph from './components/PriceGraph';
 import StatsPanel from './components/StatsPanel';
 import ActionButtons from './components/ActionButtons';
 
-// Global State Management
+// Global State & Intelligence
 import { useIpo } from './context/IpoContext';
 import { PiService } from './services/pi.service';
 
@@ -25,75 +25,80 @@ function App() {
   const { 
     currentUser, 
     setCurrentUser, 
-    metrics, 
     loading, 
     setLoading, 
     refreshData 
   } = useIpo();
 
   /**
-   * Lifecycle: Bootstrapping the MapCap Ecosystem.
-   * Handles Pi SDK Handshake and initial data fetch.
+   * SYSTEM BOOTSTRAP:
+   * Lifecycle method to synchronize the Pi Network environment with 
+   * the MapCap Node.js ledger.
    */
   useEffect(() => {
-    const initializeApp = async () => {
+    const initializeMapCap = async () => {
       try {
         if (window.Pi) {
-          // Initialize Pi SDK (Set sandbox: false for Production Launch)
+          // Initialize Pi SDK (Note: sandbox should be false for mainnet deployment)
           window.Pi.init({ version: "2.0", sandbox: true });
           
-          // Step 1: Secure Pioneer Authentication
+          // Step 1: Secure Pioneer Authentication [Daniel's Security Requirement]
           const user = await PiService.authenticate();
           setCurrentUser(user);
           
-          // Step 2: Hydrate Global State with Pioneer-specific Metrics
+          // Step 2: Hydrate Global State with real-time IPO Metrics (Values 1-4)
           await refreshData(user.username);
+        } else {
+          console.warn("Pi SDK not detected. Ensure you are within the Pi Browser.");
         }
       } catch (err) {
         console.error("Critical: SDK handshake failed or Pioneer rejected Auth.", err);
       } finally {
-        setLoading(false); // Transition out of loading state
+        // Step 3: Transition out of loading state to reveal the dashboard
+        setLoading(false); 
       }
     };
 
-    initializeApp();
+    initializeMapCap();
   }, [setCurrentUser, refreshData, setLoading]);
 
   /**
-   * LOADING SCREEN (U2A Branding)
-   * Enforced during the verification of the Pi Ledger and User Auth.
+   * LOADING EXPERIENCE:
+   * Professional branding transition while auditing the Pi Network Ledger.
    */
   if (loading) {
     return (
-      <div className="flex-center loading-screen" style={{height: '100vh', background: 'var(--mapcap-green)', color: 'var(--mapcap-gold)'}}>
-        <div className="text-center animate-pulse">
-          <h2 style={{letterSpacing: '3px', fontWeight: '800'}}>MAPCAP IPO</h2>
-          <p style={{fontSize: '0.85rem', marginTop: '12px', opacity: '0.9'}}>Auditing Pi Network Ledger...</p>
+      <div className="flex-center loading-screen">
+        <div className="brand-pulse">
+          <h2 className="brand-title">MAPCAP IPO</h2>
+          <div className="loader-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <p className="loading-text">Synchronizing with Pi Network Ledger...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="mapcap-root">
+    <div className="mapcap-root-container">
       
-      {/* SECTION 1: TOP (33.33vh) - Branding & Market Visualization
-          Displays the PriceGraph fed by dailyPrices dataset. */}
-      
-      <section className="section-top">
+      {/* SECTION 1: TOP (33.33vh) - MARKET VISUALIZATION
+          Host for PriceGraph component & Brand Identity. */}
+      <section className="layout-section section-top">
         <Navbar username={currentUser?.username} />
         <PriceGraph />
       </section>
 
-      {/* SECTION 2: MIDDLE (33.33vh) - Transparency Ledger
-          Renders Value 1, 2, 3, and 4 (Capital Gain) metrics. */}
-      <section className="section-middle">
+      {/* SECTION 2: MIDDLE (33.33vh) - THE TRANSPARENCY LEDGER
+          Renders the 4 Mandatory IPO Metrics (Investors, Total Pi, User Stake, Capital Gain). */}
+      <section className="layout-section section-middle">
         <StatsPanel />
       </section>
 
-      {/* SECTION 3: BOTTOM (33.33vh) - Pioneer Liquidity Controls
-          The action hub for IPO participation (Invest/Withdraw). */}
-      <section className="section-bottom">
+      {/* SECTION 3: BOTTOM (33.33vh) - LIQUIDITY CONTROLS
+          Operational hub for Investments and A2UaaS Withdrawals. */}
+      <section className="layout-section section-bottom">
         <ActionButtons />
       </section>
 
