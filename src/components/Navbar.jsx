@@ -4,7 +4,7 @@
  * Architect: Eslam Kora | Spec: Philip Jennings [Page 3, 8]
  * Project: MapCap Ecosystem | Map-of-Pi
  * * This component renders the top-tier branding and navigation icons.
- * Enhanced to support real-time data re-sync via Context Hook.
+ * Enhanced for Spec Compliance: External M.A.C AI Chat integration.
  */
 
 import React from 'react';
@@ -15,51 +15,57 @@ const Navbar = () => {
   const { currentUser, refreshData, setLoading } = useIpo();
 
   /**
-   * Action: External Help
-   * Redirects the Pioneer to the M.A.C AI Chatbot for support.
+   * Action: External Help per Spec [Page 3, Requirement 53-54]
+   * Redirects the Pioneer to chatwithmac.com (M.A.C AI Chatbot).
+   * Using window.open with _blank to preserve the IPO app session.
    */
   const handleHelpClick = () => {
-    window.location.href = "https://chatwithmac.com";
+    window.open("https://chatwithmac.com", "_blank");
   };
 
   /**
    * Action: Smart Sync
-   * Re-fetches the latest IPO metrics from the MERN engine without a full page reload.
-   * Aligns with Requirement [78] for data transparency.
+   * Re-fetches the latest IPO metrics from the MERN engine.
+   * Aligns with Requirement [78] for real-time data transparency.
    */
   const handleRefreshClick = async () => {
     if (currentUser?.username) {
       setLoading(true);
-      await refreshData(currentUser.username);
-      setLoading(false);
+      try {
+        await refreshData(currentUser.username);
+      } catch (err) {
+        console.error("Manual refresh failed:", err);
+      } finally {
+        setLoading(false);
+      }
     } else {
-      // Fallback: If session is lost, reload the entire SDK lifecycle
+      // If session is lost during the interaction, re-trigger SDK login
       window.location.reload();
     }
   };
 
   return (
     <nav className="main-navbar">
-      {/* App Branding: Centralized gold title on green background [Page 8] */}
+      {/* App Branding: Requirement [Page 8] - Gold title on MapCap Green */}
       <div className="navbar-title">
-        MapCapIPO {currentUser ? `- @${currentUser.username}` : 'app'}
+        MapCapIPO {currentUser ? ` - @${currentUser.username}` : ' app'}
       </div>
 
-      {/* Navigation Icons: Balanced 5-icon spread across the viewport */}
+      {/* Navigation Icons: Balanced 5-icon horizontal spread [Philip's UX Spec] */}
       <div className="navbar-icons">
         
-        {/* Left: Navigational Placeholder (Gold left-facing arrow) */}
+        {/* 1. Left: Navigational Back Arrow (Gold) */}
         <span className="icon-gold" title="Back">←</span>
 
-        {/* Left/Middle: Home silhouette - Inactive in Single-Screen layout */}
+        {/* 2. Left/Middle: Home silhouette */}
         <span className="icon-gold" title="Home">🏠</span>
 
-        {/* Center: The MapCap/Pi Token Branding */}
+        {/* 3. Center: Pi Token / MapCap Branding */}
         <div className="token-icon-wrapper">
           <span className="icon-gold pi-logo animate-pulse">π</span>
         </div>
 
-        {/* Right/Middle: Active Help (Link to Chat with Map) */}
+        {/* 4. Right/Middle: Active Help (Link to M.A.C AI) */}
         <span 
           className="icon-gold active-btn" 
           title="Help" 
@@ -68,7 +74,7 @@ const Navbar = () => {
           ❓
         </span>
 
-        {/* Right: Active Smart-Refresh (Real-time Ledger Sync) */}
+        {/* 5. Right: Active Smart-Refresh (Real-time Ledger Sync) */}
         <span 
           className="icon-gold active-btn" 
           title="Refresh" 
