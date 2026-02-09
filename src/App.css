@@ -1,16 +1,18 @@
 /**
- * MapCapIPO Official Stylesheet v1.0
- * Architected by Eslam Kora | Based on Philip Jennings' UX Document
- * * DESIGN PRINCIPLES:
- * 1. Single Screen View: No scrolling, fixed 100vh layout.
- * 2. Visual Hierarchy: Balanced 33.33% vertical split.
- * 3. Branding: Hex-accurate Green (#1b5e20) and Gold (#ffd700).
+ * MapCapIPO Official Design System v1.1
+ * Architected by Eslam Kora | AppDev @Map-of-Pi
+ * ---------------------------------------------------------
+ * This stylesheet enforces Philip Jennings' "Single-Screen" vision.
+ * Key Rules: 
+ * - Fixed Viewport (No Scroll)
+ * - MapCap Green (#1b5e20) & Gold (#ffd700)
+ * - High-Precision SVG Graph Styling
  */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
 :root {
-  /* Official Color Palette [Source: Page 3] */
+  /* Brand Palette [Source: Page 3] */
   --mapcap-green: #1b5e20;
   --mapcap-gold: #ffd700;
   --pure-white: #ffffff;
@@ -24,7 +26,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent; /* Optimized for mobile touch */
+  -webkit-tap-highlight-color: transparent; /* Mobile Optimization */
 }
 
 body, html {
@@ -33,7 +35,7 @@ body, html {
   font-family: 'Inter', sans-serif;
   background-color: var(--pure-white);
   color: var(--text-main);
-  overflow: hidden; /* Prevents bounce-scroll on mobile browsers */
+  overflow: hidden; /* Strict Single-Screen Policy [Source: Page 8] */
 }
 
 .mapcap-root {
@@ -44,8 +46,8 @@ body, html {
 }
 
 /**
- * SECTION LAYOUT [Source: Page 8 Screen Layout]
- * Divides the viewport into three equal vertical zones.
+ * CORE LAYOUT: THREE PILLARS
+ * Each section occupies exactly 33.33% of the height.
  */
 .section-top, 
 .section-middle, 
@@ -55,40 +57,36 @@ body, html {
   display: flex;
   flex-direction: column;
   position: relative;
+  overflow: hidden;
 }
 
-/* --- TOP SECTION: BRANDING & MARKET DATA --- */
+/* --- SECTION 1: TOP (NAVBAR & GRAPH) --- */
 
 .main-navbar {
   background-color: var(--mapcap-green);
   color: var(--mapcap-gold);
-  padding: 12px 0;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  z-index: 10;
+  padding: 10px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
 }
 
 .navbar-title {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
   text-align: center;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 5px;
 }
 
 .navbar-icons {
   display: flex;
   justify-content: space-evenly;
-  align-items: center;
+  padding: 5px 0;
 }
 
 .icon-gold {
   color: var(--mapcap-gold);
-  font-size: 1.4rem;
-  cursor: pointer;
-}
-
-.active-btn:active {
-  transform: scale(0.9); /* Feedback for mobile touch */
+  font-size: 1.2rem;
 }
 
 .graph-container {
@@ -97,126 +95,145 @@ body, html {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 10px;
+  padding: 5px 15px;
 }
 
 .mapcap-svg-graph {
   width: 100%;
-  max-width: 400px;
+  max-width: 380px;
   height: auto;
 }
 
-.axis-line { stroke: var(--mapcap-green); stroke-width: 1; }
-.axis-label { fill: var(--mapcap-green); font-size: 10px; font-weight: 600; }
-.price-guideline { stroke: #e0e0e0; stroke-width: 0.5; }
+/* Graph Elements Styling */
+.axis-line { stroke: var(--mapcap-green); stroke-width: 1.5; }
+.axis-label { fill: var(--mapcap-green); font-size: 9px; font-weight: 600; }
+.price-guideline { stroke: #d1d1d1; stroke-width: 1; stroke-dasharray: 4; }
+.glow-node { filter: drop-shadow(0 0 4px var(--mapcap-gold)); }
 
-/* --- MIDDLE SECTION: TRANSPARENT LEDGER --- */
+/* --- SECTION 2: MIDDLE (STATS LEDGER) --- */
 
 .stats-panel {
-  padding: 0 25px;
+  padding: 10px 25px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background: linear-gradient(to bottom, #ffffff, #fafafa);
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .section-title {
   color: var(--mapcap-green);
-  font-size: 1rem;
-  margin-bottom: 15px;
-  border-left: 4px solid var(--mapcap-gold);
-  padding-left: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  text-transform: uppercase;
 }
 
 .stats-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .stat-item {
-  font-size: 0.9rem;
-  font-weight: 400;
+  font-size: 0.85rem;
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px dashed #eee;
-  padding-bottom: 4px;
+  align-items: center;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #f9f9f9;
 }
+
+.stat-label { color: var(--text-muted); }
+.stat-value { font-weight: 600; color: var(--mapcap-green); }
 
 .highlight-gain {
+  background-color: #f1f8e9; /* Light green tint */
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px dashed var(--mapcap-green);
   color: var(--mapcap-green);
   font-weight: 700;
-  border-bottom: none;
 }
 
-/* --- BOTTOM SECTION: LIQUIDITY CONTROLS --- */
+/* --- SECTION 3: BOTTOM (ACTIONS) --- */
 
 .action-center {
-  padding: 0 30px;
-  background-color: var(--pure-white);
-  gap: 15px;
+  padding: 15px 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
 }
 
 .input-group {
   display: flex;
-  width: 100%;
   gap: 10px;
-  align-items: center;
+  width: 100%;
 }
 
 .input-wrapper {
-  position: relative;
   flex: 1;
+  position: relative;
 }
 
 .input-field {
   width: 100%;
-  padding: 12px 15px;
-  border: 2px solid #eee;
+  padding: 12px;
+  border: 1.5px solid #e0e0e0;
   border-radius: 8px;
-  background: var(--input-bg);
   font-size: 1rem;
   font-weight: 600;
-  transition: var(--transition);
+  outline: none;
 }
 
 .input-field:focus {
   border-color: var(--mapcap-green);
-  background: #fff;
-}
-
-.input-unit {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.8rem;
-  color: var(--text-muted);
 }
 
 .btn-mapcap {
   background-color: var(--mapcap-green);
   color: var(--mapcap-gold);
   border: none;
-  padding: 12px 20px;
+  padding: 12px;
   border-radius: 8px;
   font-weight: 700;
-  min-width: 130px;
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(27, 94, 32, 0.2);
-  transition: var(--transition);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  min-width: 110px;
+  box-shadow: 0 4px 0 #0d3210; /* Depth effect */
+  transition: all 0.1s;
 }
 
 .btn-mapcap:active {
   transform: translateY(2px);
-  box-shadow: none;
+  box-shadow: 0 2px 0 #0d3210;
 }
 
-/* --- UTILS --- */
-.flex-center { display: flex; justify-content: center; align-items: center; }
-.animate-pulse { animation: pulse 2s infinite; }
-@keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.5; }
-  100% { opacity: 1; }
+/* --- UTILITIES & ANIMATIONS --- */
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
+
+.loading-screen {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-pulse {
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.98); }
+}
+
+.text-center { text-align: center; }
